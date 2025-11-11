@@ -1,0 +1,613 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="fr"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Évaluateur de Lecture à Voix Haute&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://unpkg.com/@babel/standalone/babel.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="root"&gt;&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script type="text/babel"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const { useState, useRef, useEffect } = React;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Icônes SVG simplifiées</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const Icons = {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>Users: () =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>Plus: () =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>Trash: () =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>Download: () =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>FileText: () =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>Mic: () =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>StopCircle: () =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>CheckCircle: () =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>AlertCircle: () =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function ClassReadingManager() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [view, setView] = useState('teacher');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [assignments, setAssignments] = useState([]);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [selectedAssignment, setSelectedAssignment] = useState(null);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [currentStudent, setCurrentStudent] = useState('');</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [newAssignmentTitle, setNewAssignmentTitle] = useState('');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [newAssignmentText, setNewAssignmentText] = useState('');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [newAssignmentDeadline, setNewAssignmentDeadline] = useState('');</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [isRecording, setIsRecording] = useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [audioBlob, setAudioBlob] = useState(null);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [isAnalyzing, setIsAnalyzing] = useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [analysis, setAnalysis] = useState(null);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [error, setError] = useState('');</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const mediaRecorderRef = useRef(null);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const chunksRef = useRef([]);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>useEffect(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>loadData();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}, []);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const loadData = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const stored = localStorage.getItem('assignments');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (stored) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>setAssignments(JSON.parse(stored));</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>} catch (err) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>console.log('Aucune donnée existante');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const saveAssignments = (newAssignments) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>localStorage.setItem('assignments', JSON.stringify(newAssignments));</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setAssignments(newAssignments);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>} catch (err) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setError('Erreur lors de la sauvegarde');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const createAssignment = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!newAssignmentTitle || !newAssignmentText) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setError('Veuillez remplir le titre et le texte');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const newAssignment = {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>id: Date.now().toString(),</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>title: newAssignmentTitle,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>text: newAssignmentText,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>deadline: newAssignmentDeadline,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>createdAt: new Date().toISOString(),</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>submissions: []</p>
+<p class="p1"><span class="Apple-converted-space">                </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const updated = [...assignments, newAssignment];</p>
+<p class="p1"><span class="Apple-converted-space">                </span>saveAssignments(updated);</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>setNewAssignmentTitle('');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setNewAssignmentText('');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setNewAssignmentDeadline('');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setError('');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const deleteAssignment = (id) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (confirm('Êtes-vous sûr de vouloir supprimer ce devoir ?')) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const updated = assignments.filter(a =&gt; a.id !== id);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>saveAssignments(updated);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const handleFileUpload = (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const file = e.target.files[0];</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (file) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const reader = new FileReader();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>reader.onload = (event) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>setNewAssignmentText(event.target.result);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>};</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>reader.readAsText(file);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const startRecording = async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const stream = await navigator.mediaDevices.getUserMedia({ audio: true });</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>mediaRecorderRef.current = new MediaRecorder(stream);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>chunksRef.current = [];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>mediaRecorderRef.current.ondataavailable = (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>if (e.data.size &gt; 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>chunksRef.current.push(e.data);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>mediaRecorderRef.current.onstop = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const blob = new Blob(chunksRef.current, { type: 'audio/webm' });</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>setAudioBlob(blob);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>stream.getTracks().forEach(track =&gt; track.stop());</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>mediaRecorderRef.current.start();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setIsRecording(true);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setError('');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>} catch (err) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setError('Erreur d\'accès au microphone. Vérifiez les permissions.');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const stopRecording = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (mediaRecorderRef.current &amp;&amp; isRecording) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>mediaRecorderRef.current.stop();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setIsRecording(false);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const handleAudioUpload = (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const file = e.target.files[0];</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (file) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setAudioBlob(file);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const submitReading = async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!audioBlob || !currentStudent || !selectedAssignment) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setError('Veuillez entrer votre nom et enregistrer votre lecture');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>setIsAnalyzing(true);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setError('');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const base64Audio = await new Promise((resolve, reject) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const reader = new FileReader();</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>reader.onload = () =&gt; resolve(reader.result.split(',')[1]);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>reader.onerror = reject;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>reader.readAsDataURL(audioBlob);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const response = await fetch('https://api.anthropic.com/v1/messages', {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>method: 'POST',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>headers: {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>'Content-Type': 'application/json',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>body: JSON.stringify({</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>model: 'claude-sonnet-4-20250514',</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>max_tokens: 4000,</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>messages: [</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>role: 'user',</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>content: [</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>type: 'text',</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>text: `Tu es un expert en évaluation de lecture à voix haute pour des lycéens français. Analyse cet enregistrement audio et compare-le au texte de référence ci-dessous.</p>
+<p class="p2"><br></p>
+<p class="p1">TEXTE DE RÉFÉRENCE:</p>
+<p class="p1">${selectedAssignment.text}</p>
+<p class="p2"><br></p>
+<p class="p1">Fournis une analyse détaillée au format JSON avec cette structure exacte (réponds UNIQUEMENT avec le JSON, sans préambule ni backticks):</p>
+<p class="p1">{</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"transcription": "texte transcrit de l'audio",</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"fluidite": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"score": nombre entre 0 et 10,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"commentaire": "analyse de la fluidité"</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"precision": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"score": nombre entre 0 et 10,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"erreurs": ["liste des erreurs détectées"],</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"commentaire": "analyse de la précision"</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"debit": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"motsParMinute": nombre,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"evaluation": "trop lent/approprié/trop rapide",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"commentaire": "analyse du débit"</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"intonation": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"score": nombre entre 0 et 10,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"commentaire": "analyse de l'intonation et du ton"</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"pauses": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"score": nombre entre 0 et 10,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"commentaire": "analyse des pauses et de la respiration"</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"scoreGlobal": nombre entre 0 et 10,</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"pointsForts": ["liste des points forts"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"axesAmelioration": ["liste des axes d'amélioration"],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"recommandations": "recommandations pédagogiques détaillées"</p>
+<p class="p1">}`</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>type: 'document',</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>source: {</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>type: 'base64',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>media_type: 'audio/webm',</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>data: base64Audio</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>]</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>})</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const data = await response.json();</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (data.content &amp;&amp; data.content[0]) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const textContent = data.content</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>.filter(item =&gt; item.type === 'text')</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>.map(item =&gt; item.text)</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>.join('');</p>
+<p class="p2"><span class="Apple-converted-space">                        </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const cleanedText = textContent.replace(/```json\n?|\n?```/g, '').trim();</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const analysisData = JSON.parse(cleanedText);</p>
+<p class="p2"><span class="Apple-converted-space">                        </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const submission = {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>studentName: currentStudent,</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>submittedAt: new Date().toISOString(),</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>analysis: analysisData</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const updatedAssignments = assignments.map(a =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>if (a.id === selectedAssignment.id) {</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>return {</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>...a,</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>submissions: [...(a.submissions || []), submission]</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>};</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>return a;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>saveAssignments(updatedAssignments);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>setAnalysis(analysisData);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>setAudioBlob(null);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>setError('Erreur lors de l\'analyse de l\'enregistrement.');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>} catch (err) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>console.error('Erreur:', err);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setError('Erreur lors de l\'analyse. Vérifiez votre enregistrement et réessayez.');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>} finally {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setIsAnalyzing(false);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const exportResults = (assignment) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const csv = [</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>['Élève', 'Date de soumission', 'Score Global', 'Fluidité', 'Précision', 'Intonation', 'Pauses', 'Débit (mots/min)'],</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>...(assignment.submissions || []).map(sub =&gt; [</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>sub.studentName,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>new Date(sub.submittedAt).toLocaleDateString('fr-FR'),</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>sub.analysis.scoreGlobal,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>sub.analysis.fluidite.score,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>sub.analysis.precision.score,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>sub.analysis.intonation.score,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>sub.analysis.pauses.score,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>sub.analysis.debit.motsParMinute</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>])</p>
+<p class="p1"><span class="Apple-converted-space">                </span>].map(row =&gt; row.join(',')).join('\n');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const blob = new Blob([csv], { type: 'text/csv' });</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const url = URL.createObjectURL(blob);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const a = document.createElement('a');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>a.href = url;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>a.download = `${assignment.title.replace(/\s/g, '_')}_resultats.csv`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>a.click();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const ScoreCircle = ({ score, label }) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const color = score &gt;= 7 ? 'text-green-600' : score &gt;= 5 ? 'text-yellow-600' : 'text-red-600';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className="flex flex-col items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className={`text-3xl font-bold ${color}`}&gt;{score}/10&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="text-sm text-gray-600 mt-1"&gt;{label}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (view === 'teacher') {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 p-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="max-w-7xl mx-auto"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className="bg-white rounded-xl shadow-lg p-8 mb-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="flex items-center justify-between flex-wrap gap-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;h1 className="text-3xl font-bold text-purple-900 mb-2 flex items-center gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;Icons.Users /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>Gestion de Classe - Lecture à Voix Haute</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;p className="text-gray-600"&gt;Espace Professeur&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>onClick={() =&gt; setView('student')}</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition"</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>Accès Élèves</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className="bg-white rounded-xl shadow-lg p-6 mb-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;Icons.Plus /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>Créer un Nouveau Devoir</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/h2&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="space-y-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;label className="block text-sm font-medium text-gray-700 mb-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>Titre du devoir</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>type="text"</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>value={newAssignmentTitle}</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>onChange={(e) =&gt; setNewAssignmentTitle(e.target.value)}</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>placeholder="Ex: Lecture de Lysistrata - Acte I"</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;label className="block text-sm font-medium text-gray-700 mb-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>Date limite (optionnel)</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>type="date"</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>value={newAssignmentDeadline}</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>onChange={(e) =&gt; setNewAssignmentDeadline(e.target.value)}</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;label className="block text-sm font-medium text-gray-700 mb-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>Importer le texte</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>type="file"</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>accept=".txt"</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>onChange={handleFileUpload}</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;label className="block text-sm font-medium text-gray-700 mb-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>Ou coller le texte</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;textarea</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>value={newAssignmentText}</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>onChange={(e) =&gt; setNewAssignmentText(e.target.value)}</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>placeholder="Collez le texte que les élèves devront lire..."</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>className="w-full h-40 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>onClick={createAssignment}</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>className="w-full bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition font-semibold"</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>Créer le Devoir</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className="bg-white rounded-xl shadow-lg p-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;h2 className="text-xl font-semibold text-gray-800 mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>Devoirs Créés ({assignments.length})</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/h2&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{assignments.length === 0 ? (</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;p className="text-gray-500 text-center py-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>Aucun devoir créé pour le moment</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>) : (</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div className="space-y-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{assignments.map(assignment =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div key={assignment.id} className="border border-gray-200 rounded-lg p-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div className="flex items-start justify-between mb-3 flex-wrap gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;div className="flex-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>&lt;h3 className="text-lg font-semibold text-gray-800"&gt;{assignment.title}&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>&lt;p className="text-sm text-gray-600 mt-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                            </span>Créé le {new Date(assignment.createdAt).toLocaleDateString('fr-FR')}</p>
+<p class="p1"><span class="Apple-converted-space">                                                            </span>{assignment.deadline &amp;&amp; ` • Échéance: ${new Date(assignment.deadline).toLocaleDateString('fr-FR')}`}</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>&lt;p className="text-sm text-indigo-600 font-medium mt-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                            </span>{assignment.submissions?.length || 0} soumission(s)</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>onClick={() =&gt; deleteAssignment(assignment.id)}</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>className="text-red-600 hover:text-red-700 p-2"</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>title="Supprimer"</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>&lt;Icons.Trash /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div className="bg-gray-50 rounded p-3 mb-3 max-h-32 overflow-y-auto text-sm text-gray-700"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>{assignment.text.substring(0, 200)}...</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>{assignment.submissions &amp;&amp; assignment.submissions.length &gt; 0 &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">                                                            </span>onClick={() =&gt; exportResults(assignment)}</p>
+<p class="p1"><span class="Apple-converted-space">                                                            </span>className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm mb-3"</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                            </span>&lt;Icons.Download /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                            </span>Exporter les Résultats (CSV)</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>&lt;div className="space-y-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                            </span>&lt;h4 className="font-medium text-gray-700 text-sm"&gt;Soumissions:&lt;/h4&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                            </span>{assignment.submissions.map((sub, idx) =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                                                                </span>&lt;div key={idx} className="bg-indigo-50 rounded p-3 text-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                                    </span>&lt;div className="flex items-center justify-between flex-wrap gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                                        </span>&lt;span className="font-medium text-indigo-900"&gt;{sub.studentName}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                                        </span>&lt;span className="text-2xl font-bold text-indigo-600"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                                            </span>{sub.analysis.scoreGlobal}/10</p>
+<p class="p1"><span class="Apple-converted-space">                                                                        </span>&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                                    </span>&lt;p className="text-gray-600 text-xs mt-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                                        </span>Soumis le {new Date(sub.submittedAt).toLocaleString('fr-FR')}</p>
+<p class="p1"><span class="Apple-converted-space">                                                                    </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                                    </span>&lt;div className="grid grid-cols-2 md:grid-cols-5 gap-2 mt-2 text-xs"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                                        </span>&lt;div&gt;Fluidité: {sub.analysis.fluidite.score}/10&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                                        </span>&lt;div&gt;Précision: {sub.analysis.precision.score}/10&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                                        </span>&lt;div&gt;Intonation: {sub.analysis.intonation.score}/10&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                                        </span>&lt;div&gt;Pauses: {sub.analysis.pauses.score}/10&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                                        </span>&lt;div&gt;Débit: {sub.analysis.debit.motsParMinute} m/min&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                            </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>{error &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;Icons.AlertCircle /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;span className="text-red-800"&gt;{error}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className="max-w-6xl mx-auto"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="bg-white rounded-xl shadow-lg p-8 mb-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className="flex items-center justify-between flex-wrap gap-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;h1 className="text-3xl font-bold text-indigo-900 mb-2 flex items-center gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;Icons.FileText /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>Mes Devoirs de Lecture</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;p className="text-gray-600"&gt;Espace Élève&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>onClick={() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>setView('teacher');</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>setSelectedAssignment(null);</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>setAnalysis(null);</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition"</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>Accès Professeur</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>{!selectedAssignment ? (</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className="bg-white rounded-xl shadow-lg p-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;h2 className="text-xl font-semibold text-gray-800 mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>Devoirs Disponibles</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/h2&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{assignments.length === 0 ? (</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;p className="text-gray-500 text-center py-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>Aucun devoir disponible pour le moment</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>) : (</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div className="grid gap-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>{assignments.map(assignment =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div key={assignment.id} className="border border-indigo-200 rounded-lg p-4 hover:bg-indigo-50 transition"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;h3 className="text-lg font-semibold text-gray-800 mb-2"&gt;{assignment.title}&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>{assignment.deadline &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;p className="text-sm text-red-600 mb-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                        </span>📅 Échéance: {new Date(assignment.deadline).toLocaleDateString('fr-FR')}</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>onClick={() =&gt; setSelectedAssignment(assignment)}</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>Commencer ce Devoir</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>) : (</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>onClick={() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>setSelectedAssignment(null);</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>setAnalysis(null);</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>setAudioBlob(null);</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>setCurrentStudent('');</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>}}</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>className="mb-4 text-indigo-600 hover:text-indigo-700 font-medium"</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>← Retour aux devoirs</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="bg-white rounded-xl shadow-lg p-6 mb-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;h2 className="text-2xl font-bold text-gray-800 mb-4"&gt;{selectedAssignment.title}&lt;/h2&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div className="bg-gray-50 rounded-lg p-4 mb-6 max-h-64 overflow-y-auto"&gt;</p>
+</body>
+</html>
